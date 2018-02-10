@@ -51,7 +51,7 @@ func (arg Argument) String() string{
 	case Stmt:
 		result=arg.stmt.String()
 	case Reference:
-		result=fmt.Sprintf("'%d",arg.Val())
+		result=fmt.Sprintf("$%d",arg.Val())
 	}
 	return result
 }
@@ -137,6 +137,13 @@ func (fn Function) ToGo() string{
 	return result+"}"
 }
 
+func FnsToGo(fns []Function) string{
+	var result string=""
+	for _,fn:=range fns {
+		result+=fn.ToGo()+"\n"
+	}
+	return result
+}
 func joinFnSlice(slice1 []Function, slice2 []Function) []Function {
 	//make a new slice with combined size
 	var result=make([]Function, len(slice1)+len(slice2))
@@ -330,6 +337,67 @@ func (tkt TokenTree) TreeList(indent int) string{
 	}
 	return result
 }
+func (tkt TokenTree) ToArgument() Argument{
+	var result Argument=Argument{}
+	var err error
+	switch tkt.tk.tokenType {
+		case TkNumber:
+		result.argType=Number;
+		result.value,err=strconv.Atoi(tkt.tk.content)
+		if(err!=nil){
+			fmt.Printf("failed to parse token as number %s",tkt.tk.String())
+		}
+		case TkReference:
+		result.argType=Reference
+		result.value,err=strconv.Atoi(tkt.tk.content)
+		if(err!=nil){
+			fmt.Printf("failed to parse token as reference %s",tkt.tk.String())
+		}
+		case TkFunc:
+		result.argType=Stmt
+		result.stmt=tkt.ToStatement()
+	}
+	return result
+}
+func (tkt TokenTree) ToStatement() Statement{
+	if(tkt.tk.tokenType!=TkFunc){
+		fmt.Printf("warning expected function name (TkFunc) but got %s\n",tkt.tk.String())
+	}
+
+	var args []Argument=make([]Argument,0)
+	result:=Statement{funcName:tkt.tk.content}
+	for _,val:=range tkt.children{
+		if((*val).tk.tokenType!=TkEnd){
+			args=append(args,(*val).ToArgument())
+		}
+	}
+	result.args=args
+	return result
+}
+func (tkt TokenTree) ToFunction() Function{
+	if(tkt.tk.tokenType!=TkKeywordFunc){
+		fmt.Printf("warning expected function keyword (TkKeywordFunc) but got %s\n",tkt.tk.tokenType.String())
+	}
+	//first child should be the name of function to define
+	fnNameTk:=tkt.children[0].tk
+
+	result:=Function{name:fnNameTk.content}
+	var stmts []Statement=make([]Statement,0)
+
+	for _,val:=range tkt.children[1:] {
+		stmts=append(stmts,(*val).ToStatement())
+	}
+
+	result.body=stmts
+	return result
+}
+func TktsToFunction(tkts []TokenTree) []Function{
+	funcs:=make([]Function,len(tkts))
+	for i,tkt:=range tkts {
+		funcs[i]=tkt.ToFunction()
+	}
+	return funcs
+}
 
 
 func matchParenTk(tks []Token) int{
@@ -389,9 +457,9 @@ func parsetkt(tks []Token) (TokenTree, []Token) {
 	//todo: go through children and make statements trees
 	for i:=1;i<len(current);i++ {
 		if(current[i].tokenType==TkParen){
-			inside,_:=extractFromParenTk(current[i:])
-			i+=len(inside)+1//because extractfrom paren drops parens
-			parsedInside,_:=parsetkt(inside)
+			endParen:=matchParenTk(current[i:])
+			parsedInside,_:=parsetkt(current[i:i+endParen+1])
+			i+=endParen+1//because extractfrom paren drops parens
 			//if(parsedInside!=nil){
 			body=append(body,&parsedInside)
 			//}
@@ -399,7 +467,7 @@ func parsetkt(tks []Token) (TokenTree, []Token) {
 			body=append(body,&TokenTree{tk:current[i]})
 		}
 	}
-	fmt.Printf("tk:%s  |  %s",current[0],current[0:])
+	fmt.Printf("tk:%s  |  %s\n",current[0],current[0:])
 	return TokenTree{tk:current[0],children:body}, rest
 }
 
@@ -439,6 +507,14 @@ func lex(str string) []Token {
 			current.tokenType=TkNumber
 			i+=end-1
 			break
+		case s=="-":
+			if (number.MatchString(string(str[i+1]))){
+				end:=strings.IndexAny(str[i:], " )")
+				current.content=str[i:end+i]
+				current.tokenType=TkNumber
+				i+=end-1
+				break
+			}
 		default:
 			end:=strings.IndexAny(str[i:], " )")
 			current.content=str[i:end+i]
@@ -465,7 +541,8 @@ func main(){
 	//fn:=MkFunc("main",[]Statement{stmt,stmt2})
 	
 	//fmt.Println(stmt.ToGo())
-	s,_:=extractFromParenTk(lex("(+ 1 (+ 3 4))"))
-	//fmt.Println(parsetkts(lex("(fn main (+ 1 (+ 3 4)))")))
-	fmt.Println(s)
+	//s,_:=extractFromParenTk(lex("(+ 1 (+ 3 4))"))
+	tree:=parsetkts(lex("(fn main (+ 1 (+ $1 4)))(fn lmao (print (+ 2 3))(hhh -6 8))"))
+	fmt.Println(tree)
+	fmt.Println(FnsToGo(TktsToFunction(tree)))
 }

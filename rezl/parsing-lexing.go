@@ -126,6 +126,8 @@ func (tkt TokenType) String() string{
 		result="keyword_use"
 	case TkImport:
 		result="keyword_import"
+	default:
+		result="???"
 	}
 	return result
 }
@@ -160,19 +162,19 @@ func (tkt TokenTree) ToArgument() Argument{
 	var result Argument=Argument{}
 	var err error
 	switch tkt.tk.tokenType {
-		case TkNumber:
+	case TkNumber:
 		result.argType=Number;
 		result.value,err=strconv.Atoi(tkt.tk.content)
 		if(err!=nil){
 			fmt.Printf("failed to parse token as number %s",tkt.tk.String())
 		}
-		case TkReference:
+	case TkReference:
 		result.argType=Reference
 		result.value,err=strconv.Atoi(tkt.tk.content)
 		if(err!=nil){
 			fmt.Printf("failed to parse token as reference %s",tkt.tk.String())
 		}
-		case TkFunc:
+	case TkFunc:
 		result.argType=Stmt
 		result.stmt=tkt.ToStatement()
 	}
@@ -284,11 +286,14 @@ func extractFromParenTk(tks []Token) ([]Token, []Token){
 		return make([]Token,0), tks
 	}
 	if(last==-1){
-		fmt.Println("WARNING: expected TkEnd posible mismatched parens &s",tks)
+		fmt.Printf("WARNING: expected TkEnd posible mismatched parens %s",tks)
 		//no matching parenthesis
 		return make([]Token,0), tks
 	}
 	return tks[first+1:last], tks[last+1:]
+}
+func ExtractFromParenTk(tks []Token) ([]Token, []Token){
+	return extractFromParenTk(tks)
 }
 
 func ParseTkts(tks []Token) []TokenTree {
@@ -304,20 +309,15 @@ func ParseTkts(tks []Token) []TokenTree {
 
 func parseTkt(tks []Token) (TokenTree, []Token) {
 	current, rest:=extractFromParenTk(tks);
-	//fmt.Println(tks)
-	//if(len(current)==0){
-	//	return nil, rest
-	//}	
+
 	var body []*TokenTree=make([]*TokenTree,0)
-	//todo: go through children and make statements trees
+
 	for i:=1;i<len(current);i++ {
 		if(current[i].tokenType==TkParen){
 			endParen:=matchParenTk(current[i:])
 			parsedInside,_:=parseTkt(current[i:i+endParen+1])
 			i+=endParen//because extractfrom paren drops parens
-			//if(parsedInside!=nil){
 			body=append(body,&parsedInside)
-			//}
 		}else{
 			body=append(body,&TokenTree{tk:current[i]})
 		}
@@ -364,10 +364,10 @@ func Lex(str string) []Token {
 			current.tokenType=TkEnd
 			break
 		case s=="$":
-			end:=strings.Index(str[i:], " ")
+			end:=strings.IndexAny(str[i:], " )")
 			current.content=str[i+1:end+i]
 			current.tokenType=TkReference
-			i+=end
+			i+=end-1
 			break
 		case number.MatchString(string(str[i])):
 			end:=strings.IndexAny(str[i:], " )")
@@ -375,14 +375,6 @@ func Lex(str string) []Token {
 			current.tokenType=TkNumber
 			i+=end-1
 			break
-		case s=="-":
-			if (number.MatchString(string(str[i+1]))){
-				end:=strings.IndexAny(str[i:], "\n\t )")
-				current.content=str[i:end+i]
-				current.tokenType=TkNumber
-				i+=end-1
-				break
-			}
 		case s=="'":
 			end:=2
 			if(string(str[i+1])=="\\"){
@@ -424,6 +416,15 @@ func Lex(str string) []Token {
 			current.tokenType=TkEnd
 			
 			i+=end
+		case s=="-":
+			if (number.MatchString(string(str[i+1]))){
+				end:=strings.IndexAny(str[i:], "\n\t )")
+				current.content=str[i:end+i]
+				current.tokenType=TkNumber
+				i+=end-1
+				break
+			}
+			fallthrough
 		case s=="f":
 			if(str[i:i+3]=="fn "){
 				current.tokenType=TkKeywordFunc
@@ -470,7 +471,7 @@ func ParseString(str string) []Keyword {
 }
 
 func ParseFile(src string) []Keyword {
-	content:=read(src)
+	content:=Read(src)
 	return ParseString(content)
 }
 

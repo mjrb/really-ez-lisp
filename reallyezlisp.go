@@ -26,7 +26,19 @@ func main(){
 	flag.Parse()
 	rezl.STDRewrite()
 	keywords:=rezl.ParseFile(*srcFile)
+	//tks:=rezl.Lex(rezl.Read(*srcFile))
+	//inside,rest:=rezl.ExtractFromParenTk(tks)
+	//fmt.Printf("\n%s\n------\n%s\n\n",inside,rest)
+	//inside,rest=rezl.ExtractFromParenTk(rest)
+	//fmt.Printf("\n%s\n------\n%s\n\n",inside,rest)
+
 	//keywords:=rezl.ParseString("(use std)(fn main (printc 72 101 108 108 111 44 32 87 111 114 100 108 33 10))")
 	fmt.Println(rezl.KeywordsToGo(keywords))
+	//print tree
+	cont:=rezl.Read(*srcFile)
+	trees:=rezl.ParseTkts(rezl.Lex(cont))
+	for _,tree:=range trees{
+		fmt.Println(tree)
+	}
 	WriteToFile(rezl.KeywordsToGo(keywords), *outFile)
 }

@@ -7,11 +7,10 @@ a toy lisp compiler started for a very stupid reason
 - make error checker? debugging is really painful
 - file io
 - named function arguments and named referenes
-- maybe some lazy evaluation so `(if (0) (print "booo!!!"))` don't print out booo!!!
 
 ## how to compile
-`go run reallyezylisp.go -i <input file>`outputs to out.go
-`go run reallyezylisp.go -i <input file> -o <outputname>`outputs to <outputname>.go
+`go run reallyezylisp.go -i <input file>`outputs to out.go  
+`go run reallyezylisp.go -i <input file> -o <outputname>`outputs to <outputname>.go  
 ## how to run
 `go run <whatever>.go`
 
@@ -21,7 +20,7 @@ a toy lisp compiler started for a very stupid reason
 - unary / is same as 1/x
 - unary -
 - `(if (condintion) (what to return if true) (what to return if not true))`
-- `(use somthing)` copy paste contents from file named somthing. hopefuly its go code
+- `(use somthing)` copy paste contents from file named somthing. if its not go code ist very likely it wont compile
 - `(import somthing)` parse Really Ez Lisp from file called somthing.
 - `(fn main (somthing))` this somthing is all that will actually be done
 - `(fn yourFuncHere (do somthing) (actually return somthing))` func names have to be valid go names, sorry ¯\_(ツ)_/¯. also only last statment is returned
@@ -36,8 +35,13 @@ a toy lisp compiler started for a very stupid reason
 - `(printc '\n')` print newline character
 - `(printc "Hello, World!\n")` no one has ever done this before
 - `(printc (list 72 101 108 108 111 44 32 87 111 114 108 100 33 10))` same effect as above, but no one has wanted to do this before
+- `(head (list 1 2 3))` returns the first element (1)
+- `(head (list 1 2 3)(list 2 3 4)(list 3 4 5))` returns all the first elements (1 2 3 4)
+- `(tail (list 1 2 3))` returns everything but head
+- `(tail (list 1 1 2 3) (list 1 1 2 3) (list 1 1 2 3))` tail all the things! ((1 2 3)(1 2 3)(1 2 3))
+- `(and 0 1)` or `(&& 0 1 0)` can be just 2 or many
+- `(or 1 0 1)` or `(|| 0 1)` same as last  but different
 
 ## currently busted
-- probably a lot of things ¯\_(ツ)_/¯
-- $n) tends to get lexed as [$,n)] instead of [$,n] like its supposed to (i would like to solve this but its 5 am)
-- the example file has an example of merge sort but the above error broke it
+- probably a lot of things ¯\_(ツ)_/¯ but i cant think of any atm
+

@@ -92,6 +92,23 @@ func (stmt Statement) ToGo() string{
 	//(myfunction 123 (l 1 2 3))
 	//makes result myfunction([]Argument{MkArgi(123),MkArgl([]int{1,2,3})})
 	var result string = stmt.GoFnName() + "([]Argument{"
+	if(stmt.funcName=="if"){
+		//go does not have ternary oeprater so i have to pull of this
+		//nonsense of calling an anonyomous func in spot
+		//func() Argument {if(arg0!=0){return arg1}; return arg3}()
+		if(len(stmt.args)<2){
+			fmt.Println("WARNING: if expects 2 or 3 arguments")
+		}
+		result=fmt.Sprintf("func() Argument{if(%s.value!=0){",stmt.args[0].ToGo())
+		result+=fmt.Sprintf("return %s};",stmt.args[1].ToGo())
+		if(len(stmt.args)==3){
+			result+="return "+stmt.args[2].ToGo()
+		}else{
+			result+="MkArgi(0)"
+		}
+		result+="}()"
+		return result
+	}
 	for i, arg := range stmt.args{
 		result+=arg.ToGo()
 		if(i<len(stmt.args)-1){
@@ -170,7 +187,7 @@ func joinFnSlice(slice1 []Function, slice2 []Function) []Function {
 	return result
 }
 
-func read(source string) string {
+func Read(source string) string {
 	bytes,err:=ioutil.ReadFile(source)
 	if(err!=nil){
 		panic(fmt.Sprintf("FATAL: could not read file at %s. error:%s",source,err))
@@ -223,7 +240,7 @@ func MkArgr(to int) Argument{
 	return Argument{value:to,argType:Reference}
 }
 func MkUse(src string) Use{
-	cont:=read(src)
+	cont:=Read(src)
 	return Use{source:src,content:cont}
 }
 func MkImport(src string) Import{

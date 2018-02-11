@@ -19,4 +19,6 @@ func STDRewrite() {
 	FnRewrite("print", "RezPrint")
 	FnRewrite("printc", "RezPrintc")
 	FnRewrite("len","RezLen")
+	FnRewrite("||", "or")
+	FnRewrite("&&", "and")
 }

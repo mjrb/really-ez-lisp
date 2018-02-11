@@ -17,7 +17,7 @@ a toy lisp compiler started for a very stupid reason
 
 
 ## things you can do
-- + - * /
+- `+ - * /`
 - unary / is same as 1/x
 - unary -
 - `(if (condintion) (what to return if true) (what to return if not true))`

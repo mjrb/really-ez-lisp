@@ -1,7 +1,7 @@
-## Really Ez Lisp
+# Really Ez Lisp
 a toy lisp compiler started for a very stupid reason
 
-# goals
+## goals
 - compile down to more native like go
 - make webasebly and myssql targets happen
 - make error checker? debugging is really painful
@@ -9,14 +9,14 @@ a toy lisp compiler started for a very stupid reason
 - named function arguments and named referenes
 - maybe some lazy evaluation so `(if (0) (print "booo!!!"))` don't print out booo!!!
 
-# how to compile
+## how to compile
 `go run reallyezylisp.go -i <input file>`outputs to out.go
 `go run reallyezylisp.go -i <input file> -o <outputname>`outputs to <outputname>.go
-# how to run
+## how to run
 `go run <whatever>.go`
 
 
-# things you can do
+## things you can do
 - + - * /
 - unary / is same as 1/x
 - unary -
@@ -37,7 +37,7 @@ a toy lisp compiler started for a very stupid reason
 - `(printc "Hello, World!\n")` no one has ever done this before
 - `(printc (list 72 101 108 108 111 44 32 87 111 114 108 100 33 10))` same effect as above, but no one has wanted to do this before
 
-# currently busted
+## currently busted
 - probably a lot of things ¯\_(ツ)_/¯
 - $n) tends to get lexed as [$,n)] instead of [$,n] like its supposed to (i would like to solve this but its 5 am)
 - the example file has an example of merge sort but the above error broke it

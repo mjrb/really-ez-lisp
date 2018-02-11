@@ -278,13 +278,67 @@ func RezLen(args []Argument) Argument{
 	}
 	return MkArgi(len(args[0].Contents()))
 }
+func join(args []Argument) Argument{
+	result:=make([]Argument,0)
+	for _,arg:=range args {
+		if(arg.argType==List){
+			result=append(result,arg.data...)
+		}else{
+			result=append(result,arg)
+		}
+	}
+	return MkArgl(result)
+}
+func and(args []Argument) Argument{
+	for _,arg:=range args {
+		if(arg.Val()==0){
+			return MkArgi(0)
+		}
+	}
+	return MkArgi(1);
+}
+func or(args []Argument) Argument{
+	for _,arg:=range args {
+		if(arg.Val()!=0){
+			return MkArgi(1)
+		}
+	}
+	return MkArgi(0);
+}
+func tail(args []Argument) Argument{
+	if(len(args)==1){
+		if(args[0].argType==Number){
+			return MkArgi(args[0].value)
+		}
+		return MkArgl(args[0].data[1:])
+	}
+	contents:=make([]Argument,len(args))
+	for i,arg:=range args {
+		contents[i]=tail([]Argument{arg})
+	}
+	return MkArgl(contents)
+}
+func head(args []Argument) Argument{
+	if(len(args)==1){
+		if(args[0].argType==Number){
+			return MkArgi(args[0].value)
+		}
+		return MkArgi(args[0].data[0].value)
+	}
+	contents:=make([]Argument,len(args))
+	for i,arg:=range args {
+		contents[i]=head([]Argument{arg})
+	}
+	return MkArgl(contents)
+}
 
+func merge(args []Argument) Argument{
+return func() Argument{if(and([]Argument{RezEqual([]Argument{RezLen([]Argument{args[0]}),MkArgi(0)}),RezGreater([]Argument{RezLen([]Argument{args[1]}),MkArgi(0)})}).value!=0){return func() Argument{if(RezEqual([]Argument{RezLen([]Argument{args[1]}),MkArgi(1)}).value!=0){return get([]Argument{MkArgi(0),args[1]})};return join([]Argument{get([]Argument{MkArgi(0),args[1]}),merge([]Argument{args[0],tail([]Argument{args[1]})})})}()};return func() Argument{if(RezEqual([]Argument{RezLen([]Argument{args[1]}),MkArgi(0)}).value!=0){return func() Argument{if(RezEqual([]Argument{RezLen([]Argument{args[0]}),MkArgi(1)}).value!=0){return get([]Argument{MkArgi(0),args[0]})};return func() Argument{if(RezGreater([]Argument{RezLen([]Argument{args[0]}),MkArgi(1)}).value!=0){return join([]Argument{head([]Argument{args[0]}),merge([]Argument{tail([]Argument{args[0]}),args[1]})})};return RezPrint([]Argument{args[0],args[1],MkArgi(10)})}()}()};return func() Argument{if(RezLesser([]Argument{get([]Argument{MkArgi(0),args[0]}),get([]Argument{MkArgi(0),args[1]})}).value!=0){return join([]Argument{head([]Argument{args[0]}),merge([]Argument{tail([]Argument{args[0]}),args[1]})})};return join([]Argument{head([]Argument{args[1]}),merge([]Argument{args[0],tail([]Argument{args[1]})})})}()}()}()
+}
+func mergeSort(args []Argument) Argument{
+return func() Argument{if(RezEqual([]Argument{MkArgi(2),RezLen([]Argument{args[0]})}).value!=0){return func() Argument{if(RezGreater([]Argument{get([]Argument{MkArgi(1),args[0]}),head([]Argument{args[0]})}).value!=0){return list([]Argument{head([]Argument{args[0]}),get([]Argument{MkArgi(1),args[0]})})};return list([]Argument{get([]Argument{MkArgi(1),args[0]}),head([]Argument{args[0]})})}()};return func() Argument{if(RezEqual([]Argument{MkArgi(1),RezLen([]Argument{args[0]})}).value!=0){return list([]Argument{head([]Argument{args[0]})})};return merge([]Argument{mergeSort([]Argument{get([]Argument{MkArgi(0),RezDiv([]Argument{RezLen([]Argument{args[0]}),MkArgi(2)}),args[0]})}),mergeSort([]Argument{get([]Argument{RezDiv([]Argument{RezLen([]Argument{args[0]}),MkArgi(2)}),RezLen([]Argument{args[0]}),args[0]})})})}()}()
+}
 func main(){
-RezPrint([]Argument{RezIf([]Argument{RezEqual([]Argument{MkArgi(1),MkArgi(1)}),MkArgi(1)})})
-RezPrint([]Argument{RezIf([]Argument{RezEqual([]Argument{MkArgi(1),MkArgi(0)}),MkArgi(20)})})
-RezPrint([]Argument{RezIf([]Argument{RezEqual([]Argument{MkArgi(1),MkArgi(0)}),MkArgi(20),MkArgi(2)})})
-RezPrint([]Argument{RezIf([]Argument{RezGreater([]Argument{MkArgi(1),MkArgi(0)}),MkArgi(3)})})
-RezPrint([]Argument{RezIf([]Argument{RezLesser([]Argument{MkArgi(1),MkArgi(0)}),MkArgi(20),MkArgi(4)})})
-RezPrint([]Argument{RezLen([]Argument{list([]Argument{MkArgi(1),MkArgi(2),MkArgi(3),MkArgi(4)})})})
-RezPrintc([]Argument{list([]Argument{MkArgi(72),MkArgi(101),MkArgi(108),MkArgi(108),MkArgi(111),MkArgi(44),MkArgi(32),MkArgi(87),MkArgi(111),MkArgi(114),MkArgi(108),MkArgi(100),MkArgi(33),MkArgi(10)})})
+RezPrint([]Argument{mergeSort([]Argument{list([]Argument{MkArgi(7),MkArgi(4),MkArgi(3),MkArgi(8),MkArgi(9),MkArgi(6),MkArgi(2),MkArgi(1),MkArgi(5)})})})
+RezPrintc([]Argument{MkArgi(10)})
 }

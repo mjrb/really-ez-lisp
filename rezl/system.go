@@ -104,7 +104,7 @@ func (stmt Statement) ToGo() string{
 		if(len(stmt.args)==3){
 			result+="return "+stmt.args[2].ToGo()
 		}else{
-			result+="MkArgi(0)"
+			result+="return MkArgi(0)"
 		}
 		result+="}()"
 		return result

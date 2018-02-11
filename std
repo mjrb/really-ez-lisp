@@ -278,3 +278,56 @@ func RezLen(args []Argument) Argument{
 	}
 	return MkArgi(len(args[0].Contents()))
 }
+func join(args []Argument) Argument{
+	result:=make([]Argument,0)
+	for _,arg:=range args {
+		if(arg.argType==List){
+			result=append(result,arg.data...)
+		}else{
+			result=append(result,arg)
+		}
+	}
+	return MkArgl(result)
+}
+func and(args []Argument) Argument{
+	for _,arg:=range args {
+		if(arg.Val()==0){
+			return MkArgi(0)
+		}
+	}
+	return MkArgi(1);
+}
+func or(args []Argument) Argument{
+	for _,arg:=range args {
+		if(arg.Val()!=0){
+			return MkArgi(1)
+		}
+	}
+	return MkArgi(0);
+}
+func tail(args []Argument) Argument{
+	if(len(args)==1){
+		if(args[0].argType==Number){
+			return MkArgi(args[0].value)
+		}
+		return MkArgl(args[0].data[1:])
+	}
+	contents:=make([]Argument,len(args))
+	for i,arg:=range args {
+		contents[i]=tail([]Argument{arg})
+	}
+	return MkArgl(contents)
+}
+func head(args []Argument) Argument{
+	if(len(args)==1){
+		if(args[0].argType==Number){
+			return MkArgi(args[0].value)
+		}
+		return MkArgi(args[0].data[0].value)
+	}
+	contents:=make([]Argument,len(args))
+	for i,arg:=range args {
+		contents[i]=head([]Argument{arg})
+	}
+	return MkArgl(contents)
+}

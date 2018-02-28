@@ -91,7 +91,7 @@ func (stmt Statement) GoFnName() string{
 func (stmt Statement) ToGo() string{
 	//(myfunction 123 (l 1 2 3))
 	//makes result myfunction([]Argument{MkArgi(123),MkArgl([]int{1,2,3})})
-	var result string = stmt.GoFnName() + "([]Argument{"
+	var result string = stmt.GoFnName() + "("
 	if(stmt.funcName=="if"){
 		//go does not have ternary oeprater so i have to pull of this
 		//nonsense of calling an anonyomous func in spot
@@ -115,7 +115,7 @@ func (stmt Statement) ToGo() string{
 			result+=","
 		}
 	}
-	return result+"})"
+	return result+")"
 }
 
 type Keyword interface{
@@ -147,9 +147,9 @@ func (fn Function) String() string{
 	return result
 }
 func (fn Function) ToGo() string{
-	result:=fmt.Sprintf("func %s(args []Argument) Argument{\n", fn.name)
+	result:=fmt.Sprintf("func %s(args... Argument) Argument{\n", fn.name)
 	if(fn.name=="main"){
-		result=fmt.Sprintf("func %s(){\n", fn.name)
+		result=fmt.Sprintf("func main(){\n")
 	}
 	for i,val:=range fn.body {
 		if (i<len(fn.body)-1){

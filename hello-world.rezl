@@ -1,4 +1,4 @@
 (use std)
 (fn main
-    (printc "Hello, Wolrd!\n")
+    (printc "Hello World!\n")    
 )

@@ -29,8 +29,8 @@
 	(if (= 1 (len $0))
 	    (list (head $0))
 	    (merge
-		(mergeSort (get 0 (/ (len $0 ) 2) $0 ))
-		(mergeSort (get (/ (len $0 ) 2) (len $0 ) $0 ))
+		(mergeSort (getMany 0 (/ (len $0 ) 2) $0 ))
+		(mergeSort (getMany (/ (len $0 ) 2) (len $0 ) $0 ))
 	    )
 	)
     )

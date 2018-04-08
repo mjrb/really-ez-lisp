@@ -1,12 +1,16 @@
 # Really Ez Lisp
 a toy lisp compiler started for a very stupid reason
 
+# WARNING!!
+this project is being rewritten on another branch.
+if you want to see the fancy features look at Really-Ez-Lisp2
+
 ## goals
 - compile down to more native like go
-- make webasebly and myssql targets happen
+- make web assembly and MySQL targets happen
 - make error checker? debugging is really painful
 - file io
-- named function arguments and named referenes
+- named function arguments and named references
 
 ## how to compile
 `go run reallyezylisp.go -i <input file>`outputs to out.go  
@@ -19,16 +23,16 @@ a toy lisp compiler started for a very stupid reason
 - `+ - * /`
 - unary / is same as 1/x
 - unary -
-- `(if (condintion) (what to return if true) (what to return if not true))`
-- `(use somthing)` copy paste contents from file named somthing. if its not go code ist very likely it wont compile
-- `(import somthing)` parse Really Ez Lisp from file called somthing.
-- `(fn main (somthing))` this somthing is all that will actually be done
-- `(fn yourFuncHere (do somthing) (actually return somthing))` func names have to be valid go names, sorry ¯\_(ツ)_/¯. also only last statment is returned
+- `(if (condition) (what to return if true) (what to return if not true))`
+- `(use something)` copy paste contents from file named something. if its not go code its very likely it wont compile
+- `(import something)` parse Really Ez Lisp from file called something.
+- `(fn main (something))` this something is all that will actually be done
+- `(fn yourFuncHere (do something) (actually return something))` func names have to be valid go names, sorry ¯\_(ツ)_/¯. also only last statement is returned
 - `(fn example (+ $0 1)))` $n gives the nth argument supplied to the function. (terrible!!!)
 - `(list 1 2 3 4)` make list [1 2 3 4]
 - `(get 0 (list 1 2))` gets element 0
 - `(get 1 2 (list 0 1 2 3))` gets elements 1-2
-- `(get 1 2 (list 0 1 2 3)(list 0 1 2 3))` returns list of sublists you asked for. im verry proud of this one!!!
+- `(get 1 2 (list 0 1 2 3)(list 0 1 2 3))` returns list of sub-lists you asked for. I'm very proud of this one!!!
 - `(len (list 1 2 3))` this should be obvious, but this language does have this feature
 - `(print 123)` prints 123
 - `(printc 127829)` print whatever character. in this case 🍕
